@@ -1,5 +1,5 @@
 // Generated from .agents/skills/muster/*.md. Do not edit by hand.
-// Regenerate with: bun run build-skill.ts [--src DIR] [--out FILE]
+// Regenerate with: bun run scripts/build-skill.ts [--src DIR] [--out FILE]
 
 export const SKILL_SECTIONS: Record<string, string> = {
   "skill": `---

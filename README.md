@@ -172,9 +172,9 @@ muster skill [skill|cli|mcp|cards|all]
 or `all` to read guides. Other arguments search all bundled skill files, for
 example `muster skill pending`. MCP clients can read `muster://skill` or use
 `muster://skill?section=pending`. The resource template is
-`muster://skill{?section}`. These guides are embedded in the service and
-compiled executable; regenerate them with `bun run build-skill.ts` in
-`service/` after editing `.agents/skills/muster/`.
+`muster://skill{?section}`. These guides are embedded in the app and
+compiled executable; regenerate them with `bun run build-skill` after editing
+`.agents/skills/muster/`.
 
 Add `--json` to any command for machine output. `--path` resolves a project
 from another folder; `--project` uses a project key directly. `MUSTER_HOME`
@@ -217,25 +217,22 @@ the file stays where it is. Never put secrets in a card, note or event.
 ## Repository layout
 
 ```text
-themes/       muster.json (dark), muster-day.json (light)
-layouts/      muster.json
-keys.json     the layout:muster bindings
-mods/muster/  one mod, one view per props.app
-service/      Bun service: SQLite store, CLI, MCP server, tests
-docs/         agent snippet and this package's notes
-service/src/installer/  Herdr installation and embedded assets
-SPEC.md       the model, the wire formats and the decisions
+cli.ts, install.ts  command-line entry point and install dispatcher
+app/                SQLite store, project logic, skill and MCP server
+targets/herdr/      Herdr installer, themes, layout, mod and bindings
+tests/              app and installation tests
+scripts/            embedded asset and skill generators
+docs/               agent snippet and package notes
+SPEC.md             model, wire formats and decisions
 ```
 
 ## Development
 
 ```powershell
-cd service
-bun test                 # 33 tests: project resolution, store, MCP protocol
-bun install              # only for the type checker
+bun install              # development dependencies, including the type checker
+bun test                 # application and installer tests
 bun run typecheck
-cd ..
-herdr-app check mods\muster
+herdr-app check targets\herdr\mods\muster
 ```
 
 The tests use temporary folders and never touch `%LOCALAPPDATA%\Muster`.
@@ -244,6 +241,6 @@ The tests use temporary folders and never touch `%LOCALAPPDATA%\Muster`.
 
 v1 is the board, cards, runbooks and stats. Deferred: inbox and mail
 integrations, CI status, monitors, remote/shared stores, and any host-specific
-assumptions such as unix sockets, `sh -c`, `lsof` or `sips`. The service is
+assumptions such as unix sockets, `sh -c`, `lsof` or `sips`. The app is
 plain TypeScript on Bun, so a hosted or remote store can be added behind the
 same CLI and MCP surface later.

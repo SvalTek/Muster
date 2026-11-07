@@ -12,5 +12,6 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": ["cli.ts", "install.ts", "app/**/*.ts", "targets/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["targets/**/mods/**"]
 }

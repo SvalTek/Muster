@@ -3,10 +3,10 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { HERDR_ASSETS } from "../src/installer/assets.ts";
+import { HERDR_ASSETS } from "../targets/herdr/assets.ts";
 
 const root = mkdtempSync(join(tmpdir(), "muster-install-"));
-const entry = join(import.meta.dir, "../src/cli.ts");
+const entry = join(import.meta.dir, "../cli.ts");
 afterAll(() => rmSync(root, { recursive: true, force: true }));
 
 function run(...args: string[]) {
@@ -65,7 +65,7 @@ describe("Herdr installation", () => {
 
   test("embedded assets match their repository sources", () => {
     for (const [path, content] of Object.entries(HERDR_ASSETS)) {
-      expect(content).toBe(readFileSync(join(import.meta.dir, "../..", path), "utf8"));
+      expect(content).toBe(readFileSync(join(import.meta.dir, "../targets/herdr", path), "utf8"));
     }
   });
 });

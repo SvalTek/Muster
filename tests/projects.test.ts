@@ -8,7 +8,7 @@ import {
   colorForKey,
   initMarker,
   resolveProject,
-} from "../src/projects.ts";
+} from "../app/projects.ts";
 
 function tempDir(label: string): string {
   return mkdtempSync(join(tmpdir(), `muster-${label}-`));

@@ -2,11 +2,11 @@ import { describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { skillText } from "../src/skill.ts";
-import { SKILL_SECTIONS } from "../src/skill-content.ts";
+import { skillText } from "../app/skill.ts";
+import { SKILL_SECTIONS } from "../app/skill-content.ts";
 
 function cli(...args: string[]) {
-  return spawnSync(process.execPath, [join(import.meta.dir, "../src/cli.ts"), "skill", ...args], { encoding: "utf8" });
+  return spawnSync(process.execPath, [join(import.meta.dir, "../cli.ts"), "skill", ...args], { encoding: "utf8" });
 }
 
 describe("skill CLI", () => {
@@ -33,7 +33,7 @@ describe("skill CLI", () => {
 
   test("embedded guides match their source files", () => {
     for (const [key, filename] of Object.entries({ skill: "SKILL.md", cli: "cli.md", mcp: "mcp.md", cards: "cards.md" })) {
-      expect(SKILL_SECTIONS[key]).toBe(readFileSync(join(import.meta.dir, "../../.agents/skills/muster", filename), "utf8"));
+      expect(SKILL_SECTIONS[key]).toBe(readFileSync(join(import.meta.dir, "../.agents/skills/muster", filename), "utf8"));
     }
   });
 });

@@ -28,12 +28,12 @@ import {
   snapshotView,
   statsView,
   whoami,
-} from "./api.ts";
-import { initMarker, resolveProject } from "./projects.ts";
-import { skillText } from "./skill.ts";
-import { listProjects as readProjects, type CardState, type RunState, type StepState } from "./store.ts";
-import { ageText, plural } from "./util.ts";
-import { MUSTER_VERSION } from "./version.ts";
+} from "./app/api.ts";
+import { initMarker, resolveProject } from "./app/projects.ts";
+import { skillText } from "./app/skill.ts";
+import { listProjects as readProjects, type CardState, type RunState, type StepState } from "./app/store.ts";
+import { ageText, plural } from "./app/util.ts";
+import { MUSTER_VERSION } from "./app/version.ts";
 
 const BOOLEAN = new Set(["json", "force", "help", "version", "all", "live", "quiet", "no-keys"]);
 const REPEATED = new Set(["action", "choice", "ref", "state"]);
@@ -547,7 +547,7 @@ async function main(): Promise<void> {
       return;
     }
     case "projects": {
-      const rows = readProjects((await import("./db.ts")).getDb());
+      const rows = readProjects((await import("./app/db.ts")).getDb());
       emit(rows, () => {
         for (const row of rows) console.log(`${row.name.padEnd(22)} ${row.key}  ${row.source}`);
       });
@@ -573,7 +573,7 @@ async function main(): Promise<void> {
       return;
     }
     case "mcp": {
-      const { startMcp } = await import("./mcp.ts");
+      const { startMcp } = await import("./app/mcp.ts");
       await startMcp();
       return;
     }

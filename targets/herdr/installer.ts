@@ -1,9 +1,9 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
-import { musterHome } from "../paths.ts";
-import { MusterError } from "../store.ts";
-import { MUSTER_VERSION } from "../version.ts";
+import { musterHome } from "../../app/paths.ts";
+import { MusterError } from "../../app/store.ts";
+import { MUSTER_VERSION } from "../../app/version.ts";
 import { HERDR_ASSETS } from "./assets.ts";
 
 export interface HerdrInstallOptions {
@@ -56,14 +56,14 @@ export async function installHerdr(options: HerdrInstallOptions = {}) {
   const keysChanged = !options.noKeys && (existing === undefined || Object.keys(defaults).some((key) => !Object.hasOwn(existing as object, key)));
   if (keysChanged) keys["layout:muster"] = bindings;
 
-  const serviceDir = join(appHome, "service", "muster");
+  const appDir = join(appHome, "muster");
   const compiled = /(?:^|[\\/])(?:~BUN|\$bunfs)(?:[\\/]|$)/i.test(Bun.main);
   let command: string;
   let prefix: string[];
   let bundle: Uint8Array | undefined;
   let binaryPath: string | undefined;
   if (compiled) {
-    binaryPath = join(serviceDir, basename(process.execPath));
+    binaryPath = join(appDir, basename(process.execPath));
     command = binaryPath;
     prefix = [];
   } else {
@@ -71,7 +71,7 @@ export async function installHerdr(options: HerdrInstallOptions = {}) {
     if (!result.success || !result.outputs[0]) throw new MusterError("install_build", `Could not bundle Muster: ${result.logs.join("; ")}`);
     bundle = new Uint8Array(await result.outputs[0].arrayBuffer());
     command = process.execPath;
-    prefix = [join(serviceDir, "cli.js")];
+    prefix = [join(appDir, "cli.js")];
   }
 
   const backups: string[] = [];
@@ -84,7 +84,7 @@ export async function installHerdr(options: HerdrInstallOptions = {}) {
     mkdirSync(dirname(dest), { recursive: true });
     writeFileSync(dest, content);
   }
-  mkdirSync(serviceDir, { recursive: true });
+  mkdirSync(appDir, { recursive: true });
   if (bundle) writeFileSync(prefix[0]!, bundle);
   if (binaryPath && resolve(process.execPath).toLowerCase() !== resolve(binaryPath).toLowerCase()) copyFileSync(process.execPath, binaryPath);
   mkdirSync(dataHome, { recursive: true });

@@ -1,5 +1,5 @@
-import { MusterError } from "./store.ts";
-import { installHerdr, type HerdrInstallOptions } from "./installer/herdr.ts";
+import { MusterError } from "./app/store.ts";
+import { installHerdr, type HerdrInstallOptions } from "./targets/herdr/installer.ts";
 
 /** Dispatch installation targets; Herdr is the default target. */
 export async function install(target: string, options: HerdrInstallOptions) {

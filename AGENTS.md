@@ -2,18 +2,18 @@
 
 ## Project Structure & Module Organization
 
-Muster is a Herdr package backed by a local Bun and SQLite service. Service code is in `service/src/`: `store.ts` owns persistence, `api.ts` shares operations, and `cli.ts` and `mcp.ts` expose them. Tests live in `service/test/`. The Herdr views and SVG icons are in `mods/muster/`; layout and theme definitions are in `layouts/` and `themes/`. `keys.json` contains bindings, `service/src/installer/` installs the Herdr package, and `SPEC.md` documents shared contracts.
+Muster is a Bun and SQLite app with a CLI, MCP server and Herdr target. Shared app code is in `app/`: `store.ts` owns persistence, `api.ts` shares operations, and `mcp.ts` serves MCP. Root `cli.ts` is the entry point and `install.ts` dispatches installation targets. `targets/herdr/` owns its installer, mod, SVG icons, layout, themes and bindings. Tests live in `tests/`; `SPEC.md` documents shared contracts.
 
 ## Build, Test, and Development Commands
 
-Run service commands from `service/` with Bun 1.1 or newer:
+Run commands from the repository root with Bun 1.1 or newer:
 
 - `bun test` runs the service test suite.
 - `bun install` installs development dependencies for type checking.
 - `bun run typecheck` runs TypeScript without emitting files.
 - `bun run muster -- version` runs the CLI; `bun run mcp` starts its stdio MCP server.
 
-From the repository root, `herdr-app check mods\muster` checks the mod. Run `muster install` to install the Herdr package; use `--app-home DIR`, `--muster-home DIR`, or `--no-keys` when needed. Run `bun run build-herdr-assets.ts` in `service/` after changing Herdr assets.
+`herdr-app check targets\herdr\mods\muster` checks the mod. Run `muster install` to install the Herdr package; use `--app-home DIR`, `--muster-home DIR`, or `--no-keys` when needed. Run `bun run build-herdr-assets` after changing Herdr assets and `bun run build-skill` after changing skill files.
 
 ## Coding Style & Naming Conventions
 
@@ -21,7 +21,7 @@ Follow nearby TypeScript and JavaScript: two-space indentation, double-quoted st
 
 ## Testing Guidelines
 
-Use Bun's `bun:test` and name service tests `*.test.ts` under `service/test/`. Add focused coverage for behavior changes, especially project identity, store operations and MCP contracts. Use temporary directories and isolated `MUSTER_HOME`/`MUSTER_DB` values; do not touch a real user database. Run `bun test` and `bun run typecheck` before submitting service changes. No coverage threshold is specified.
+Use Bun's `bun:test` and name tests `*.test.ts` under `tests/`. Add focused coverage for behavior changes, especially project identity, store operations and MCP contracts. Use temporary directories and isolated `MUSTER_HOME`/`MUSTER_DB` values; do not touch a real user database. Run `bun test` and `bun run typecheck` before submitting app changes. No coverage threshold is specified.
 
 ## Commits & Pull Requests
 

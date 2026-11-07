@@ -5,6 +5,18 @@
   "type": "module",
   "description": "Muster CLI and MCP server for project-scoped agent coordination.",
   "bin": {
-    "muster": "./service/src/cli.ts"
+    "muster": "./cli.ts"
+  },
+  "scripts": {
+    "muster": "bun run cli.ts",
+    "mcp": "bun run cli.ts mcp",
+    "build-herdr-assets": "bun run scripts/build-herdr-assets.ts",
+    "build-skill": "bun run scripts/build-skill.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.0",
+    "typescript": "^5.7.0"
   }
 }

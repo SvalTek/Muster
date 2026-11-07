@@ -35,7 +35,8 @@ Muster MCP server is connected, use the equivalent tools instead — see
 
 Install the CLI with `bun install -g 'github:SvalTek/Muster#main'`, then run
 `muster whoami`. Use `muster install` to install the Herdr layout, theme and
-mod. The Herdr install record is at `%USERPROFILE%\.config\herdr-app\muster.json`.
+mod, or `muster uninstall` to turn them off while preserving data. The Herdr
+install record is at `%USERPROFILE%\.config\herdr-app\muster.json`.
 Add `--json` for machine-readable output.
 
 ## Details

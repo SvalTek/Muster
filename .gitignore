@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-service/node_modules/
 
 # Local configuration and credentials
 .env
@@ -22,7 +21,7 @@ muster.db
 
 # Build output
 bin/muster.exe
-service/dist/
+dist/
 
 # Editor / OS
 .vscode/settings.json

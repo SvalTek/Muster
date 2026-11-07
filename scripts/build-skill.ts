@@ -1,13 +1,13 @@
 #!/usr/bin/env bun
-// Regenerate service/src/skill-content.ts from the skill markdown files.
-// Usage: bun run build-skill.ts [--src DIR] [--out FILE]
+// Regenerate app/skill-content.ts from the skill markdown files.
+// Usage: bun run scripts/build-skill.ts [--src DIR] [--out FILE]
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 
 const args = process.argv.slice(2);
 let src = resolve(import.meta.dir, "../.agents/skills/muster");
-let out = resolve(import.meta.dir, "src/skill-content.ts");
+let out = resolve(import.meta.dir, "../app/skill-content.ts");
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--src") src = resolve(args[++i] ?? "");
   else if (args[i] === "--out") out = resolve(args[++i] ?? "");
@@ -32,7 +32,7 @@ function escape(value: string): string {
 }
 
 const body = `// Generated from .agents/skills/muster/*.md. Do not edit by hand.
-// Regenerate with: bun run build-skill.ts [--src DIR] [--out FILE]
+// Regenerate with: bun run scripts/build-skill.ts [--src DIR] [--out FILE]
 
 export const SKILL_SECTIONS: Record<string, string> = {
 ${Object.entries(sections)

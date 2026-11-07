@@ -340,13 +340,13 @@ except protocol messages is written to stdout; logs go to stderr.
 
 - Server name: `muster`. Supports MCP `2025-06-18`, `2025-03-26` and
   `2024-11-05`; an unknown requested version falls back to the newest.
-- Advertises tools, plus empty resources and prompts. Implements `initialize`,
-  `ping`, `tools/list`, `tools/call`, the empty resource/prompt lists,
+- Advertises tools and the `muster://skill` resource and section template, with
+  an empty prompts list. Implements `initialize`, `ping`, tool and resource calls,
   `logging/setLevel`, and the usual notifications.
 - Requests are processed in order because `ask_human` and `await_card` may
   block for up to 120 seconds.
 - The `initialize` result carries `MUSTER_INSTRUCTIONS` (see
-  `service/src/instructions.ts` and `docs/agents-snippet.md`).
+  `app/instructions.ts` and `docs/agents-snippet.md`).
 - Run identity prefers explicit tool parameters, then `MUSTER_PATH` /
   `MUSTER_AGENT` / `MUSTER_CLIENT`, `MUSTER_TERMINAL`, `HERDR_TERMINAL_ID`, then
   the server's working folder.
@@ -381,7 +381,7 @@ instruction not to invent an answer.
 <app home>/themes/muster-day.json      light theme
 <app home>/layouts/muster.json         the layout
 <app home>/mods/muster/                the mod (JS, mod.json, icons)
-<app home>/service/                    the Bun service (src, package.json)
+<app home>/muster/                     the bundled CLI or standalone executable
 <app home>/muster.json                 the mod's install record
 <data home>/muster.db                  the SQLite database
 ```
@@ -396,17 +396,17 @@ The mod cannot read environment variables, so the installer writes:
 ```json
 {
   "command": "bun",
-  "prefix": ["C:\\Users\\you\\.config\\herdr-app\\service\\src\\cli.ts"],
+  "prefix": ["C:\\Users\\you\\.config\\herdr-app\\muster\\cli.js"],
   "db": "C:\\Users\\you\\AppData\\Local\\Muster\\muster.db",
   "version": "0.1.0"
 }
 ```
 
 `state.js` reads it from `appHome()/muster.json`. If it is missing it falls back
-to `bun <app home>/service/src/cli.ts`. `db` is prepended as `--db <path>` so
+to `bun <app home>/muster/cli.js`. `db` is prepended as `--db <path>` so
 the window and the CLI always agree, even when `LOCALAPPDATA` differs. With
-`-Compile`, `command` points at `<app home>/bin/muster.exe` and `prefix` is
-empty.
+the standalone binary, `command` points at the copy in `<app home>/muster/`
+and `prefix` is empty.
 
 The mod runs the CLI through `exec(command, [...prefix, ...args])`; it never
 uses `sh -c` or environment injection.
@@ -477,7 +477,7 @@ Commands are broadcast to every mounted view; each copy drains the queue with
   for project membership.
 - Git is invoked with `spawnSync(..., { windowsHide: true, timeout: 10s })`.
 - `.muster.json` discovery walks from a drive folder to its root.
-- The installer is PowerShell (`install.ps1`), merges keys with a timestamped
+- `muster install` merges keys with a timestamped
   backup, and leaves existing bindings alone.
 - The service also runs on macOS and Linux; `%LOCALAPPDATA%` becomes
   `XDG_DATA_HOME`.

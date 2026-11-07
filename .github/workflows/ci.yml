@@ -1,0 +1,85 @@
+name: Muster CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun test
+      - name: Check generated content
+        shell: bash
+        run: |
+          bun run build-skill
+          bun run build-herdr-assets
+          git diff --exit-code -- app/skill-content.ts targets/herdr/assets.ts
+
+  build:
+    name: Build (${{ matrix.name }})
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: windows-x64
+            executable: muster-windows-x64.exe
+          - os: ubuntu-latest
+            name: linux-x64
+            executable: muster-linux-x64
+          - os: ubuntu-24.04-arm
+            name: linux-arm64
+            executable: muster-linux-arm64
+          - os: macos-15-intel
+            name: macos-x64
+            executable: muster-macos-x64
+          - os: macos-latest
+            name: macos-arm64
+            executable: muster-macos-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - name: Compile and smoke test
+        shell: bash
+        env:
+          EXECUTABLE: ${{ matrix.executable }}
+        run: |
+          mkdir -p dist
+          bun build --compile ./cli.ts --outfile "dist/$EXECUTABLE"
+          "./dist/$EXECUTABLE" version
+          "./dist/$EXECUTABLE" skill cli > /dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: muster-${{ matrix.name }}
+          path: dist/${{ matrix.executable }}
+          if-no-files-found: error
+          retention-days: 7

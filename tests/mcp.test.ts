@@ -2,9 +2,9 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { closeDb } from "../src/db.ts";
-import { answerCardById } from "../src/api.ts";
-import { handleMessage } from "../src/mcp.ts";
+import { closeDb } from "../app/db.ts";
+import { answerCardById } from "../app/api.ts";
+import { handleMessage } from "../app/mcp.ts";
 
 let dir: string;
 let project: string;

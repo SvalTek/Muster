@@ -3,8 +3,8 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Database } from "bun:sqlite";
-import { openDatabase } from "../src/db.ts";
-import type { ResolvedProject } from "../src/projects.ts";
+import { openDatabase } from "../app/db.ts";
+import type { ResolvedProject } from "../app/projects.ts";
 import {
   answerCard,
   board,
@@ -20,7 +20,7 @@ import {
   setRunState,
   snapshot,
   stats,
-} from "../src/store.ts";
+} from "../app/store.ts";
 
 const ref: ResolvedProject = {
   key: "gh:acme/api",

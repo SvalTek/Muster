@@ -13,6 +13,7 @@ import {
   doctor,
   eventsView,
   importRunbookFor,
+  listArtifactsFor,
   listCardsFor,
   logEventFor,
   MusterError,
@@ -136,6 +137,8 @@ Usage:
   muster card dismiss <id>
   muster event log --kind K [--data JSON]
   muster event list [--project KEY] [--limit N]
+  muster artifact add [--card ID] (--file F | --url U) [--title T] [--mime M]
+  muster artifact list [--card ID] [--project KEY]
   muster runbook import <file.md> [--slug S] [--title T]
   muster runbook list [--project KEY]
   muster runbook show [--slug S] [--project KEY]
@@ -414,6 +417,30 @@ async function main(): Promise<void> {
         return;
       }
       throw new MusterError("usage", `Unknown event command: ${sub}`);
+    }
+    case "artifact": {
+      if (!sub || sub === "list") {
+        const result = listArtifactsFor({ projectKey, path: ctx.path, cardId: flags.string("card") });
+        emit(result, () => {
+          if (!result.length) console.log("No artifacts.");
+          for (const artifact of result) {
+            console.log(`${artifact.kind}  ${artifact.title}  ${artifact.path ?? artifact.url}`);
+          }
+        });
+        return;
+      }
+      if (sub === "add") {
+        const result = addArtifactFor(ctx, {
+          cardId: flags.string("card") ?? null,
+          path: flags.string("file") ?? rest[0],
+          url: flags.string("url"),
+          title: flags.string("title"),
+          mime: flags.string("mime"),
+        });
+        emit(result, () => console.log(`Added ${result.kind} ${result.title}`));
+        return;
+      }
+      throw new MusterError("usage", `Unknown artifact command: ${sub}`);
     }
     case "runbook": {
       if (!sub || sub === "list" || sub === "show") {

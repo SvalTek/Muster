@@ -306,6 +306,13 @@ export function addArtifactFor(ctx: AgentContext, input: Omit<AddArtifactInput, 
   return addArtifact(getDb(), { ...input, projectId: here.project.id, runId: here.run.id });
 }
 
+export function listArtifactsFor(options: { projectKey?: string; path?: string; cardId?: string } = {}) {
+  return listArtifacts(getDb(), {
+    cardId: options.cardId,
+    projectId: options.projectKey ? projectFor(options).id : undefined,
+  });
+}
+
 function projectFor(options: { projectKey?: string; path?: string }): Project {
   const db = getDb();
   if (options.projectKey) {

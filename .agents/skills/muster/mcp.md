@@ -3,8 +3,8 @@
 If the Muster MCP server is connected to your client, prefer its tools over
 shelling out to the CLI. The server is the same executable — `muster mcp` —
 and every tool returns the same objects as the corresponding CLI command
-(see [cli.md](./cli.md)). The CLI instructions remain the fallback when MCP
-is unavailable.
+(see [cli.md](./cli.md)). This page is the fallback reference; the CLI
+instructions remain canonical when MCP is unavailable.
 
 ## Connect
 
@@ -43,13 +43,11 @@ Any stdio MCP client:
 One server is enough for many repositories: every tool takes an optional
 `path`, and `muster_whoami` defaults to the folder the client started the
 server in. Prefer starting the server in the repository, or pass `path`
-explicitly.
-
-## Initialize
+explicitly. Note the artifact tool uses `path`/`url` (MCP naming), while the
+CLI uses `--file`/`--url` to avoid colliding with the global `--path`.
 
 `initialize` returns Muster's policy as `instructions` — the same rules as
-this skill. Reading it counts as having loaded the skill; you don't need to
-re-read the files below unless you want the full CLI reference.
+this skill. Reading it counts as having loaded the skill.
 
 ## Tools
 

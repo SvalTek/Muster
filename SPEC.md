@@ -308,6 +308,8 @@ muster card dismiss <id>
 muster answer <id> [...]                      # shorthand for card answer
 muster event log --kind K [--data JSON]
 muster event list [--project KEY] [--card ID] [--limit N]
+muster artifact add [--card ID] (--file F | --url U) [--title T] [--mime M]
+muster artifact list [--card ID] [--project KEY]
 muster runbook import <file.md> [--slug S] [--title T]
 muster runbook list [--project KEY]
 muster runbook show [--slug S] [--project KEY]

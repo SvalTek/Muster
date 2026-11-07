@@ -1,6 +1,6 @@
 ---
 name: muster
-description: Report agent work to Muster — start a run, post cards, ask the human, and track runbooks from the CLI or MCP.
+description: Use Muster to report agent status, ask the human for decisions, post result cards, and track runbooks — via the muster CLI, or the MCP tools when the server is available.
 license: MIT
 ---
 
@@ -9,60 +9,53 @@ license: MIT
 Muster is the project's coordination layer. A person watches a Herdr window;
 you report through Muster so they don't have to read your terminal.
 
-The CLI is the reference surface: every operation an MCP tool does exists as a
-command, and both print the same objects. This skill focuses on the CLI. If
-the Muster MCP server is connected, use the equivalent tools instead — see
+The CLI is the reference surface: every operation an MCP tool does exists as
+a command, and both print the same objects. This skill is CLI-first. If the
+Muster MCP server is connected, use the equivalent tools instead — see
 [mcp.md](./mcp.md).
 
-## When to use
+## Workflow
 
-- **Starting work:** run `muster whoami` — it resolves the project, opens your
-  run, and shows the cards already waiting for you.
-- **Reporting:** `muster status working|blocked|done|failed` with a concrete
-  one-line summary whenever things change.
-- **Asking:** `muster ask` for decisions, approvals, or anything you'd
-  otherwise guess. A `pending` answer is not a yes — never invent one.
-- **Posting:** `muster card post` for results, risks, failing checks, or
-  decision records a person must see.
-- **Runbooks:** `muster runbook show` / `muster runbook step` to follow and
-  tick off the project's steps.
-- **Reading:** `muster card list`, `muster board`, `muster stats`,
-  `muster snapshot --json` for the attention list and activity.
-
-## Quick start
-
-```text
-muster whoami
-muster status working "adding retry to the payments client"
-muster ask --question "Which retry policy?" \
-  --choice backoff:"Exponential backoff" \
-  --choice fail:"Fail fast" --timeout 0
-muster card list
-muster status done "retry uses backoff; tests pass"
-```
-
-Full command reference, flags, and examples: [cli.md](./cli.md).
-MCP tools and client setup: [mcp.md](./mcp.md).
-Card lifecycle, runbooks, artifacts, and style rules: [cards.md](./cards.md).
-
-## Rules
-
-- Titles are short and concrete. Bodies may be markdown.
-- Use `--dedupe` on every retry so one report doesn't become five.
-- Resolve the cards you opened before finishing; never mark a runbook step
-  done unless its command really succeeded.
-- Never put secrets, tokens, or private keys in cards, notes, or events.
+1. **Start:** `muster whoami` — resolves the project, opens (or refreshes)
+   your run, and shows the cards already waiting for you.
+2. **Work:** `muster status working "…"` with a concrete one-line summary.
+   `blocked` the moment you cannot continue on your own.
+3. **Ask, don't guess:** `muster ask --question "…" --choice id:label …`
+   for decisions, approvals, or missing context. If it returns `pending`,
+   the person hasn't answered — never invent an answer. Continue other work
+   and re-check with `muster card show <id>` later.
+4. **Post:** `muster card post` for anything a person must see (result,
+   risk, failing check, decision record). Always set `--dedupe` on retries.
+5. **Runbooks:** `muster runbook show`, then `muster runbook step <n>
+   doing|done|blocked --note "…"`. Never mark done unless the command ran.
+6. **Finish:** `muster status done|failed "…"` and resolve the cards you
+   opened. Don't leave finished work in the attention list.
 
 ## Finding the CLI
 
 The installer writes the exact command to
-`%USERPROFILE%\.config\herdr-app\muster.json` (`command` + `prefix`, or
-`<app home>\bin\muster.exe` with `-Compile`). For example:
+`%USERPROFILE%\.config\herdr-app\muster.json`:
 
 ```powershell
 Get-Content "$env:USERPROFILE\.config\herdr-app\muster.json"
+# { "command": "bun", "prefix": ["…\service\src\cli.ts"], … }
+# or, with -Compile: { "command": "…\bin\muster.exe", "prefix": [] }
 ```
 
-Prefer the MCP tools when the server is connected (they return the same
-objects with less shell quoting). Otherwise shell out to the CLI as shown in
-[cli.md](./cli.md).
+Run `bun <prefix> whoami` (or the exe). If the file is missing, fall back to
+`bun …\service\src\cli.ts whoami` under the app home. Add `--json` for
+machine-readable output.
+
+## Details
+
+- Full command reference, flags, and examples: [cli.md](./cli.md)
+- MCP tools and client setup: [mcp.md](./mcp.md)
+- Card lifecycle, project identity, runbooks, artifacts, style: [cards.md](./cards.md)
+
+## Rules
+
+- Titles are short and concrete. Bodies may be markdown.
+- Say what changed, what's uncertain, and what the person should do next.
+- Never put secrets, tokens, or private keys in cards, notes, or events.
+- `pending` is not a yes, and an empty list is not proof nothing is waiting —
+  read `whoami` / `card list` afresh at meaningful checkpoints.

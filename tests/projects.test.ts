@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import {
@@ -12,6 +12,17 @@ import {
 
 function tempDir(label: string): string {
   return mkdtempSync(join(tmpdir(), `muster-${label}-`));
+}
+
+function expectSameFile(first: string, second: string): void {
+  const a = statSync(first, { bigint: true });
+  const b = statSync(second, { bigint: true });
+  if (a.ino !== 0n && b.ino !== 0n) {
+    expect([a.dev, a.ino]).toEqual([b.dev, b.ino]);
+  } else {
+    const normalize = (path: string) => process.platform === "win32" ? realpathSync(path).toLowerCase() : realpathSync(path);
+    expect(normalize(first)).toBe(normalize(second));
+  }
 }
 
 function git(cwd: string, ...args: string[]): void {
@@ -66,7 +77,7 @@ describe("resolveProject", () => {
       const sub = resolve(dir, "src", "deep");
       mkdirSync(sub, { recursive: true });
       expect(resolveProject(sub).key).toBe("gh:acme/api");
-      expect(resolveProject(sub).root).toBe(resolve(dir));
+      expectSameFile(resolveProject(sub).root, dir);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -152,7 +163,7 @@ describe("initMarker", () => {
       expect(first.marker.runbook).toBe("docs/runbook.md");
 
       const second = initMarker(dir, { name: "Acme API" });
-      expect(second.path).toBe(first.path);
+      expectSameFile(second.path, first.path);
       expect(second.marker.id).toBe("gh:acme/api");
       expect(second.marker.name).toBe("Acme API");
       expect(resolveProject(dir).source).toBe("marker");

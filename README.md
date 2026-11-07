@@ -259,6 +259,22 @@ herdr-app check targets\herdr\mods\muster
 
 The tests use temporary folders and never touch `%LOCALAPPDATA%\Muster`.
 
+## Build channels
+
+GitHub Actions tests changes on Windows and Linux, then builds standalone
+executables for Windows x64, Linux x64/arm64, and macOS x64/arm64. Successful
+builds appear in [GitHub Releases](https://github.com/SvalTek/Muster/releases):
+
+- `stable` follows the latest successful build of `main` and is the latest release.
+- `dev` follows `develop` and is a prerelease.
+- `pr-N` follows the current head of open pull request N and is an untrusted
+  prerelease preview. A newer build replaces its assets.
+
+The tags are rolling channels rather than permanent version numbers. CI runs
+with read-only permissions; a separate publisher checks that the branch or PR
+still points at the built commit before attaching artifacts. GitHub only runs
+the publisher once its workflow file exists on the default branch (`main`).
+
 ## Scope
 
 v1 is the board, cards, runbooks and stats. Deferred: inbox and mail

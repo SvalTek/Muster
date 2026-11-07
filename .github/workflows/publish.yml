@@ -1,0 +1,117 @@
+name: Publish channel builds
+
+on:
+  workflow_run:
+    workflows: [Muster CI]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: publish-${{ github.event.workflow_run.event }}-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'pull_request')
+    runs-on: ubuntu-latest
+    steps:
+      # This workflow is loaded from the default branch. It never checks out or
+      # executes PR code: artifacts from the unprivileged CI run are data only.
+      - name: Resolve and validate channel
+        id: channel
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event.workflow_run.event }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_OWNER: ${{ github.event.workflow_run.head_repository.owner.login }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$HEAD_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo 'Invalid source commit' >&2; exit 1
+          fi
+          if [[ "$EVENT" == push ]]; then
+            case "$HEAD_BRANCH" in
+              main) tag=stable ;;
+              develop) tag=dev ;;
+              *) echo 'Not a release branch'; exit 0 ;;
+            esac
+            current=$(gh api "repos/$GITHUB_REPOSITORY/branches/$HEAD_BRANCH" --jq '.commit.sha')
+            if [[ "$current" != "$HEAD_SHA" ]]; then
+              echo 'A newer branch commit exists; skip this run'; exit 0
+            fi
+          else
+            prs=$(gh api --paginate -X GET "repos/$GITHUB_REPOSITORY/pulls" \
+              -f state=open -f "head=$HEAD_OWNER:$HEAD_BRANCH" | \
+              jq -s --arg sha "$HEAD_SHA" '[.[][] | select(.head.sha == $sha)]')
+            if [[ $(jq 'length' <<< "$prs") != 1 ]]; then
+              echo 'No unique open PR at this commit; skip this run'; exit 0
+            fi
+            number=$(jq -r '.[0].number' <<< "$prs")
+            [[ "$number" =~ ^[0-9]+$ ]] || exit 1
+            tag="pr-$number"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+      - name: Download build artifacts
+        if: steps.channel.outputs.tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --pattern 'muster-*' --dir "$RUNNER_TEMP/muster-artifacts"
+      - name: Publish release
+        if: steps.channel.outputs.tag != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.channel.outputs.tag }}
+          SOURCE_SHA: ${{ steps.channel.outputs.sha }}
+          EVENT: ${{ github.event.workflow_run.event }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/muster-artifacts"
+          files=(
+            "$root/muster-windows-x64/muster-windows-x64.exe"
+            "$root/muster-linux-x64/muster-linux-x64"
+            "$root/muster-linux-arm64/muster-linux-arm64"
+            "$root/muster-macos-x64/muster-macos-x64"
+            "$root/muster-macos-arm64/muster-macos-arm64"
+          )
+          for file in "${files[@]}"; do
+            [[ -f "$file" && ! -L "$file" && -s "$file" ]] || { echo "Missing artifact: $file" >&2; exit 1; }
+          done
+          # A newer run may have completed while artifacts were downloading.
+          if [[ "$EVENT" == push ]]; then
+            current=$(gh api "repos/$GITHUB_REPOSITORY/branches/$HEAD_BRANCH" --jq '.commit.sha')
+          else
+            number=${TAG#pr-}
+            current=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$number" --jq 'if .state == "open" then .head.sha else "closed" end')
+          fi
+          [[ "$current" == "$SOURCE_SHA" ]] || { echo 'Source changed; skip this run'; exit 0; }
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" > /dev/null 2>&1; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/$TAG" -f "sha=$SOURCE_SHA" -F force=true > /dev/null
+          else
+            gh api -X POST "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$TAG" -f "sha=$SOURCE_SHA" > /dev/null
+          fi
+          notes="Rolling $TAG build from commit $SOURCE_SHA. PR builds are untrusted previews."
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            if [[ "$TAG" == stable ]]; then
+              gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --title 'Stable' --notes "$notes" --latest
+            else
+              gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --title "$TAG" --notes "$notes" --prerelease --latest=false
+            fi
+          fi
+          gh release upload "$TAG" "${files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
+          if [[ "$TAG" == stable ]]; then
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes "$notes" --prerelease=false --latest
+          else
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes "$notes" --prerelease --latest=false
+          fi

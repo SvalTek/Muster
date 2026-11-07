@@ -21,6 +21,7 @@ import {
   type AgentContext,
 } from "./api.ts";
 import { MUSTER_INSTRUCTIONS } from "./instructions.ts";
+import { skillText } from "./skill.ts";
 import type { CardKind, CardState, RunState, StepState } from "./store.ts";
 import { MUSTER_VERSION } from "./version.ts";
 
@@ -546,7 +547,7 @@ export async function handleMessage(message: unknown): Promise<Record<string, un
           : SUPPORTED_PROTOCOLS[0];
         return reply({
           protocolVersion,
-          capabilities: { tools: { listChanged: false }, resources: {}, prompts: {} },
+          capabilities: { tools: { listChanged: false }, resources: { listChanged: false }, prompts: {} },
           serverInfo: { name: SERVER_NAME, title: "Muster", version: MUSTER_VERSION },
           instructions: MUSTER_INSTRUCTIONS,
         });
@@ -574,9 +575,43 @@ export async function handleMessage(message: unknown): Promise<Record<string, un
         }
       }
       case "resources/list":
-        return reply({ resources: [] });
+        return reply({
+          resources: [
+            {
+              uri: "muster://skill",
+              name: "Muster skill",
+              description: "The Muster workflow guide: when to use it, the CLI/MCP surfaces, and card/runbook rules. Read before using the tools.",
+              mimeType: "text/markdown",
+            },
+          ],
+        });
       case "resources/templates/list":
-        return reply({ resourceTemplates: [] });
+        return reply({
+          resourceTemplates: [
+            {
+              uriTemplate: "muster://skill{?section}",
+              name: "Muster skill section",
+              description: "Read skill, cli, mcp, cards, or all; other values search all skill files.",
+              mimeType: "text/markdown",
+            },
+          ],
+        });
+      case "resources/read": {
+        const params = request.params ?? {};
+        const uri = typeof params.uri === "string" ? params.uri : "";
+        const match = /^muster:\/\/skill(?:\/([^/?#]+))?(?:\?section=([^&#]*))?$/.exec(uri);
+        if (!match) return fail(rpcError(-32002, `Resource not found: ${uri}`));
+        let text: string;
+        try {
+          if (match[1] && match[2] !== undefined) return fail(rpcError(INVALID_PARAMS, "Specify the skill section only once."));
+          const section = match[1] ?? match[2];
+          const decoded = section === undefined ? undefined : decodeURIComponent(section.replace(/\+/g, " "));
+          text = skillText(decoded);
+        } catch (error) {
+          return fail(rpcError(-32002, error instanceof Error ? error.message : String(error)));
+        }
+        return reply({ contents: [{ uri, mimeType: "text/markdown", text }] });
+      }
       case "prompts/list":
         return reply({ prompts: [] });
       case "logging/setLevel":

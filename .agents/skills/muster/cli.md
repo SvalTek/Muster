@@ -53,6 +53,7 @@ muster runbook step <n> <todo|doing|done|blocked|skipped> [--slug S] [--note N]
 muster board [--days N]
 muster stats [--days N]
 muster snapshot [--days N]
+muster skill [section or search]
 muster projects
 muster runs [--project KEY] [--all]
 muster resolve [path] [--json]
@@ -61,6 +62,11 @@ muster doctor
 muster mcp
 muster version
 ```
+
+`muster skill` prints the main guide. Use `muster skill cli`, `muster skill
+mcp`, `muster skill cards`, or `muster skill all` to read a guide. Other
+arguments search all bundled guides case-insensitively and return matching
+Markdown sections, for example `muster skill pending`.
 
 Card kinds: `question`, `approval`, `report`, `result`, `progress`.
 Severities: `info`, `attention`, `blocked`, `success` (defaults to

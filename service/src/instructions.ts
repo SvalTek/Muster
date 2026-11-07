@@ -35,7 +35,8 @@ You report through Muster so they do not have to read your terminal.
 ## Style
 - Titles are short and concrete. Bodies may be markdown.
 - Say what changed, what is uncertain, and what the person should do next.
-- Never put secrets, tokens or private keys in a card or event.`;
+- Never put secrets, tokens or private keys in a card or event.
+- Read the \`muster://skill\` resource for the full CLI and workflow reference.`;
 
 /** A short block a repository can paste into AGENTS.md or CLAUDE.md. */
 export const AGENT_SNIPPET = `## Muster

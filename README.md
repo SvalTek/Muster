@@ -29,6 +29,22 @@ Muster has no runtime dependencies. The service uses Bun's built-in SQLite.
 
 ## Install
 
+For the CLI and MCP server alone, install from GitHub with Bun:
+
+```powershell
+bun add -g github:SvalTek/Muster
+muster skill
+muster mcp
+```
+
+From a checkout, `bun add -g .` installs the same CLI. Bun must be installed
+and its global bin directory must be on `PATH`. A compiled executable works
+without Bun; put it on `PATH` and use the same commands. `bunx` runs a package
+but does not install it globally.
+
+For the complete Herdr package, including its views and key bindings, use the
+installer below.
+
 From this folder:
 
 ```powershell
@@ -149,7 +165,16 @@ muster runbook import <file.md> [--slug S]
 muster runbook list|show [--slug S]
 muster runbook step <n> <todo|doing|done|blocked|skipped> [--slug S]
 muster board | stats | snapshot | projects | runs | doctor | mcp | version
+muster skill [skill|cli|mcp|cards|all]
 ```
+
+`muster skill` prints the bundled workflow guide; pass `cli`, `mcp`, `cards`,
+or `all` to read guides. Other arguments search all bundled skill files, for
+example `muster skill pending`. MCP clients can read `muster://skill` or use
+`muster://skill?section=pending`. The resource template is
+`muster://skill{?section}`. These guides are embedded in the service and
+compiled executable; regenerate them with `bun run build-skill.ts` in
+`service/` after editing `.agents/skills/muster/`.
 
 Add `--json` to any command for machine output. `--path` resolves a project
 from another folder; `--project` uses a project key directly. `MUSTER_HOME`

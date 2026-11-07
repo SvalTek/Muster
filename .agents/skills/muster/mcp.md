@@ -49,6 +49,13 @@ CLI uses `--file`/`--url` to avoid colliding with the global `--path`.
 `initialize` returns Muster's policy as `instructions` — the same rules as
 this skill. Reading it counts as having loaded the skill.
 
+## Skill resource
+
+Read `muster://skill` for the main guide, or use the resource template
+`muster://skill{?section}`. Named sections `cli`, `mcp`, `cards`, and `all`
+return guides; other values search across them, for example
+`muster://skill?section=pending`.
+
 ## Tools
 
 | Tool | Use it for |

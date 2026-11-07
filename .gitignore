@@ -2,6 +2,18 @@
 node_modules/
 service/node_modules/
 
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+.muster.json
+.codex/
+.aws/
+*.pem
+*.key
+*.p12
+*.pfx
+
 # Muster data (lives outside the repo by default, but never commit it)
 muster.db
 *.db

@@ -30,6 +30,7 @@ import {
   whoami,
 } from "./api.ts";
 import { initMarker, resolveProject } from "./projects.ts";
+import { skillText } from "./skill.ts";
 import { listProjects as readProjects, type CardState, type RunState, type StepState } from "./store.ts";
 import { ageText, plural } from "./util.ts";
 import { MUSTER_VERSION } from "./version.ts";
@@ -146,6 +147,7 @@ Usage:
   muster board [--days N]
   muster stats [--days N]
   muster snapshot [--days N]
+  muster skill [section or search]  # skill | cli | mcp | cards | all, or search text
   muster projects
   muster runs [--project KEY] [--all]
   muster doctor
@@ -518,6 +520,13 @@ async function main(): Promise<void> {
       emit(value, () => {
         console.log(`${value.board.length} projects · ${value.cards.length} cards · ${value.stats.totals.cardsNeeds} need you`);
       });
+      return;
+    }
+    case "skill": {
+      const section = [sub, ...rest].filter(Boolean).join(" ") || flags.string("section");
+      const text = skillText(section);
+      if (json) console.log(JSON.stringify({ section: section ?? "skill", text }, null, 2));
+      else process.stdout.write(text.endsWith("\n") ? text : `${text}\n`);
       return;
     }
     case "projects": {

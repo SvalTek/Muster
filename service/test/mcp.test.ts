@@ -84,6 +84,26 @@ describe("mcp protocol", () => {
     }
   });
 
+  test("the skill resource and its sections are discoverable and readable", async () => {
+    const resources = await rpc("resources/list");
+    expect(resources.result.resources.some((item: { uri: string }) => item.uri === "muster://skill")).toBe(true);
+    const templates = await rpc("resources/templates/list");
+    expect(templates.result.resourceTemplates.some((item: { uriTemplate: string }) => item.uriTemplate === "muster://skill{?section}")).toBe(true);
+
+    const main = await rpc("resources/read", { uri: "muster://skill" });
+    expect(main.result.contents[0].mimeType).toBe("text/markdown");
+    expect(main.result.contents[0].text).toContain("# Muster");
+    const cli = await rpc("resources/read", { uri: "muster://skill?section=cli" });
+    expect(cli.result.contents[0].text).toContain("# Muster CLI");
+    const path = await rpc("resources/read", { uri: "muster://skill/cli" });
+    expect(path.result.contents[0].text).toBe(cli.result.contents[0].text);
+    const search = await rpc("resources/read", { uri: "muster://skill?section=pending" });
+    expect(search.result.contents[0].text).toContain("# Skill search: pending");
+    expect(search.result.contents[0].text).toContain("## mcp.md");
+    expect((await rpc("resources/read", { uri: "muster://skill?section=constructor" })).result.contents[0].text).toContain("No skill results");
+    expect((await rpc("resources/read", { uri: "muster://skill?section=%ZZ" })).error?.code).toBe(-32002);
+  });
+
   test("an unknown method is refused, an unknown tool is an error result", async () => {
     const missing = await rpc("nope");
     expect(missing.error?.code).toBe(-32601);

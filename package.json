@@ -1,0 +1,10 @@
+{
+  "name": "muster-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Muster CLI and MCP server for project-scoped agent coordination.",
+  "bin": {
+    "muster": "./service/src/cli.ts"
+  }
+}

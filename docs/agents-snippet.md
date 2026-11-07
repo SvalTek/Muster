@@ -25,37 +25,22 @@ agent that calls `muster_whoami` also learns the working rules.
 
 ## Connect the MCP server
 
-The server is the same executable as the CLI, with `mcp` after it. The
-installer writes the exact paths to
-`%USERPROFILE%\.config\herdr-app\muster.json`:
-
-```powershell
-Get-Content "$env:USERPROFILE\.config\herdr-app\muster.json"
-```
-
-The result looks like:
-
-```json
-{
-  "command": "bun",
-  "prefix": ["C:\\Users\\you\\.config\\herdr-app\\service\\src\\cli.ts"],
-  "db": "C:\\Users\\you\\AppData\\Local\\Muster\\muster.db"
-}
-```
+The server is the same executable as the CLI, with `mcp` after it. Install
+the CLI with `bun install -g 'github:SvalTek/Muster#main'` and configure
+your client to run `muster mcp`.
 
 Claude Code:
 
 ```powershell
-$cli = "$env:USERPROFILE\.config\herdr-app\service\src\cli.ts"
-claude mcp add --transport stdio muster -- bun $cli mcp
+claude mcp add --transport stdio muster -- muster mcp
 ```
 
 Codex (`~/.codex/config.toml`):
 
 ```toml
 [mcp_servers.muster]
-command = "bun"
-args = ["C:\\Users\\you\\.config\\herdr-app\\service\\src\\cli.ts", "mcp"]
+command = "muster"
+args = ["mcp"]
 ```
 
 Any stdio MCP client:
@@ -64,8 +49,8 @@ Any stdio MCP client:
 {
   "mcpServers": {
     "muster": {
-      "command": "bun",
-      "args": ["C:/Users/you/.config/herdr-app/service/src/cli.ts", "mcp"]
+      "command": "muster",
+      "args": ["mcp"]
     }
   }
 }
@@ -129,9 +114,8 @@ muster runbook show
 muster runbook step 2 done --note "tests passed"
 ```
 
-`--json` gives machine-readable output. The command path written by the
-installer is `<app home>/service/src/cli.ts` (or `<app home>/bin/muster.exe`
-with `-Compile`).
+`--json` gives machine-readable output. The Herdr install record at
+`<app home>/muster.json` contains the command and arguments used by the mod.
 
 ## A working example
 

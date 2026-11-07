@@ -37,18 +37,10 @@ Muster MCP server is connected, use the equivalent tools instead — see
 
 ## Finding the CLI
 
-The installer writes the exact command to
-\`%USERPROFILE%\\.config\\herdr-app\\muster.json\`:
-
-\`\`\`powershell
-Get-Content "$env:USERPROFILE\\.config\\herdr-app\\muster.json"
-# { "command": "bun", "prefix": ["…\\service\\src\\cli.ts"], … }
-# or, with -Compile: { "command": "…\\bin\\muster.exe", "prefix": [] }
-\`\`\`
-
-Run \`bun <prefix> whoami\` (or the exe). If the file is missing, fall back to
-\`bun …\\service\\src\\cli.ts whoami\` under the app home. Add \`--json\` for
-machine-readable output.
+Install the CLI with \`bun install -g 'github:SvalTek/Muster#main'\`, then run
+\`muster whoami\`. Use \`muster install\` to install the Herdr layout, theme and
+mod. The Herdr install record is at \`%USERPROFILE%\\.config\\herdr-app\\muster.json\`.
+Add \`--json\` for machine-readable output.
 
 ## Details
 
@@ -71,9 +63,8 @@ command accepts \`--json\` and prints the same objects the MCP tools return.
 Run commands from the repository folder; the project is resolved from there
 (see [cards.md](./cards.md#project-identity) for the resolution rules).
 
-In this document \`muster\` means the configured command — \`bun
-"<prefix>\\src\\cli.ts"\` or the compiled \`bin\\muster.exe\` (see
-[SKILL.md](./SKILL.md#finding-the-cli)).
+In this document \`muster\` means the globally installed CLI or a standalone
+compiled executable (see [SKILL.md](./SKILL.md#finding-the-cli)).
 
 ## Global flags
 
@@ -96,6 +87,7 @@ or a file, so quoting doesn't eat newlines.
 ## Commands
 
 \`\`\`text
+muster install [herdr] [--app-home DIR] [--muster-home DIR] [--no-keys]
 muster whoami [--path DIR] [--agent A] [--terminal T]
 muster status <working|blocked|waiting|done|failed|idle> [summary]
 muster ask --question Q [--choice id:label]... [--timeout S] [--dedupe K]
@@ -231,23 +223,21 @@ instructions remain canonical when MCP is unavailable.
 
 ## Connect
 
-The server speaks newline-delimited JSON-RPC 2.0 over stdio. The installer
-writes the exact paths to \`%USERPROFILE%\\.config\\herdr-app\\muster.json\`
-(\`command\` + \`prefix\`, or \`<app home>\\bin\\muster.exe\` with \`-Compile\`).
+The server speaks newline-delimited JSON-RPC 2.0 over stdio. Install the CLI
+with Bun, then configure your client to run \`muster mcp\`.
 
 Claude Code:
 
 \`\`\`powershell
-$cli = "$env:USERPROFILE\\.config\\herdr-app\\service\\src\\cli.ts"
-claude mcp add --transport stdio muster -- bun $cli mcp
+claude mcp add --transport stdio muster -- muster mcp
 \`\`\`
 
 Codex (\`~/.codex/config.toml\`):
 
 \`\`\`toml
 [mcp_servers.muster]
-command = "bun"
-args = ["C:\\\\Users\\\\you\\\\.config\\\\herdr-app\\\\service\\\\src\\\\cli.ts", "mcp"]
+command = "muster"
+args = ["mcp"]
 \`\`\`
 
 Any stdio MCP client:
@@ -256,8 +246,8 @@ Any stdio MCP client:
 {
   "mcpServers": {
     "muster": {
-      "command": "bun",
-      "args": ["C:/Users/you/.config/herdr-app/service/src/cli.ts", "mcp"]
+      "command": "muster",
+      "args": ["mcp"]
     }
   }
 }

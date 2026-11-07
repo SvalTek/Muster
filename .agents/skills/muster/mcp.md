@@ -8,23 +8,21 @@ instructions remain canonical when MCP is unavailable.
 
 ## Connect
 
-The server speaks newline-delimited JSON-RPC 2.0 over stdio. The installer
-writes the exact paths to `%USERPROFILE%\.config\herdr-app\muster.json`
-(`command` + `prefix`, or `<app home>\bin\muster.exe` with `-Compile`).
+The server speaks newline-delimited JSON-RPC 2.0 over stdio. Install the CLI
+with Bun, then configure your client to run `muster mcp`.
 
 Claude Code:
 
 ```powershell
-$cli = "$env:USERPROFILE\.config\herdr-app\service\src\cli.ts"
-claude mcp add --transport stdio muster -- bun $cli mcp
+claude mcp add --transport stdio muster -- muster mcp
 ```
 
 Codex (`~/.codex/config.toml`):
 
 ```toml
 [mcp_servers.muster]
-command = "bun"
-args = ["C:\\Users\\you\\.config\\herdr-app\\service\\src\\cli.ts", "mcp"]
+command = "muster"
+args = ["mcp"]
 ```
 
 Any stdio MCP client:
@@ -33,8 +31,8 @@ Any stdio MCP client:
 {
   "mcpServers": {
     "muster": {
-      "command": "bun",
-      "args": ["C:/Users/you/.config/herdr-app/service/src/cli.ts", "mcp"]
+      "command": "muster",
+      "args": ["mcp"]
     }
   }
 }

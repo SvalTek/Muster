@@ -35,7 +35,7 @@ import { listProjects as readProjects, type CardState, type RunState, type StepS
 import { ageText, plural } from "./util.ts";
 import { MUSTER_VERSION } from "./version.ts";
 
-const BOOLEAN = new Set(["json", "force", "help", "version", "all", "live", "quiet"]);
+const BOOLEAN = new Set(["json", "force", "help", "version", "all", "live", "quiet", "no-keys"]);
 const REPEATED = new Set(["action", "choice", "ref", "state"]);
 
 class Flags {
@@ -123,6 +123,7 @@ function parse(argv: string[]): Flags {
 const USAGE = `muster ${MUSTER_VERSION} — project-scoped attention for coding agents
 
 Usage:
+  muster install [herdr] [--app-home DIR] [--muster-home DIR] [--no-keys]
   muster init [--name N] [--id ID] [--color #hex] [--runbook path] [--force]
   muster resolve [path] [--json]
   muster whoami [--path DIR] [--agent A] [--terminal T]
@@ -238,6 +239,22 @@ async function main(): Promise<void> {
   };
 
   switch (command) {
+    case "install": {
+      const { install } = await import("./install.ts");
+      const result = await install(sub, {
+        appHome: flags.string("app-home"),
+        dataHome: flags.string("muster-home"),
+        db: dbOverride,
+        noKeys: flags.bool("no-keys"),
+      });
+      emit(result, () => {
+        console.log(`Muster installed for Herdr in ${result.appHome}`);
+        console.log(`Data: ${result.db}`);
+        if (result.backups.length) console.log(`Backups: ${result.backups.join(", ")}`);
+        console.log("In Herdr, select 'Show layout: Muster' from the command palette.");
+      });
+      return;
+    }
     case "help":
     case "--help":
     case "-h": {

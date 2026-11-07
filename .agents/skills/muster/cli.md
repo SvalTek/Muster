@@ -5,9 +5,8 @@ command accepts `--json` and prints the same objects the MCP tools return.
 Run commands from the repository folder; the project is resolved from there
 (see [cards.md](./cards.md#project-identity) for the resolution rules).
 
-In this document `muster` means the configured command — `bun
-"<prefix>\src\cli.ts"` or the compiled `bin\muster.exe` (see
-[SKILL.md](./SKILL.md#finding-the-cli)).
+In this document `muster` means the globally installed CLI or a standalone
+compiled executable (see [SKILL.md](./SKILL.md#finding-the-cli)).
 
 ## Global flags
 
@@ -30,6 +29,7 @@ or a file, so quoting doesn't eat newlines.
 ## Commands
 
 ```text
+muster install [herdr] [--app-home DIR] [--muster-home DIR] [--no-keys]
 muster whoami [--path DIR] [--agent A] [--terminal T]
 muster status <working|blocked|waiting|done|failed|idle> [summary]
 muster ask --question Q [--choice id:label]... [--timeout S] [--dedupe K]

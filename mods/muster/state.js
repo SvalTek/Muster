@@ -41,7 +41,7 @@ export async function config() {
   } catch {
     // fall back below
   }
-  value ??= { command: "bun", prefix: [`${appHome()}/service/src/cli.ts`] };
+  value ??= { command: "bun", prefix: [`${appHome()}/service/muster/cli.js`] };
   if (!value.command) value.command = "bun";
   if (!Array.isArray(value.prefix)) value.prefix = [];
   globalThis[CONFIG_KEY] = { at: Date.now(), value };

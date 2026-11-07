@@ -33,7 +33,6 @@ Install the CLI and MCP server from the latest stable `main` commit:
 ```powershell
 bun install -g 'github:SvalTek/Muster#main'
 muster skill
-muster mcp
 ```
 
 Ensure Bun's global bin directory is on `PATH`. For an MCP client, configure
@@ -47,26 +46,23 @@ and its global bin directory must be on `PATH`. A compiled executable works
 without Bun; put it on `PATH` and use the same commands. `bunx` runs a package
 but does not install it globally.
 
-For the complete Herdr package, including its views and key bindings, use the
-installer below.
-
-From this folder:
+To install the Herdr theme, layout and mod, run:
 
 ```powershell
-pwsh -File .\install.ps1
+muster install
 ```
 
-The script copies the theme, layout, mod and service into the Herdr app home,
-creates the data folder (`%LOCALAPPDATA%\Muster`), writes the mod's install
-record (`muster.json`), and merges the `layout:muster` key bindings into
-`keys.json` without overwriting existing keys. It backs up `keys.json` first.
+This installs the embedded theme, layout, mod and a self-contained service into
+the Herdr app home. It creates the data folder (`%LOCALAPPDATA%\Muster` on
+Windows), writes `muster.json`, and adds missing `layout:muster` key bindings
+without replacing existing ones. Changed key bindings and an existing modified
+Muster layout are backed up. Running the command again updates Muster.
 
 Options:
 
 ```powershell
-pwsh -File .\install.ps1 -Compile          # build a single muster.exe with Bun
-pwsh -File .\install.ps1 -NoKeys           # do not touch keys.json
-pwsh -File .\install.ps1 -AppHome  D:\herdr-app -MusterHome D:\muster-data
+muster install herdr --no-keys
+muster install --app-home D:\herdr-app --muster-home D:\muster-data
 ```
 
 Then show the layout. Either press **Ctrl+Shift+L** until Muster comes up, or
@@ -81,22 +77,21 @@ Claude Code, Codex, or any other MCP client can now connect to the service.
 
 ## Connect an agent
 
-The MCP server is the same executable as the CLI, with `mcp` after it. Use the
-path the installer wrote (or run `Get-Content "$env:USERPROFILE\.config\herdr-app\muster.json"`).
+The MCP server is the same executable as the CLI, with `mcp` after it. After
+the global install, configure your client to run `muster mcp`.
 
 Claude Code:
 
 ```powershell
-$svc = "$env:USERPROFILE\.config\herdr-app\service\src\cli.ts"
-claude mcp add --transport stdio muster -- bun $svc mcp
+claude mcp add --transport stdio muster -- muster mcp
 ```
 
 Codex (`~/.codex/config.toml`):
 
 ```toml
 [mcp_servers.muster]
-command = "bun"
-args = ["C:\\Users\\you\\.config\\herdr-app\\service\\src\\cli.ts", "mcp"]
+command = "muster"
+args = ["mcp"]
 ```
 
 Any client that speaks stdio MCP:
@@ -105,8 +100,8 @@ Any client that speaks stdio MCP:
 {
   "mcpServers": {
     "muster": {
-      "command": "bun",
-      "args": ["C:/Users/you/.config/herdr-app/service/src/cli.ts", "mcp"]
+      "command": "muster",
+      "args": ["mcp"]
     }
   }
 }
@@ -228,7 +223,7 @@ keys.json     the layout:muster bindings
 mods/muster/  one mod, one view per props.app
 service/      Bun service: SQLite store, CLI, MCP server, tests
 docs/         agent snippet and this package's notes
-install.ps1   copy, compile, and merge keys
+service/src/installer/  Herdr installation and embedded assets
 SPEC.md       the model, the wire formats and the decisions
 ```
 

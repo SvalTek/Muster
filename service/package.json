@@ -10,6 +10,7 @@
   "scripts": {
     "muster": "bun run src/cli.ts",
     "mcp": "bun run src/cli.ts mcp",
+    "build-herdr-assets": "bun run build-herdr-assets.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },

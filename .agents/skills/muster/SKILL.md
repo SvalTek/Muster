@@ -33,18 +33,10 @@ Muster MCP server is connected, use the equivalent tools instead — see
 
 ## Finding the CLI
 
-The installer writes the exact command to
-`%USERPROFILE%\.config\herdr-app\muster.json`:
-
-```powershell
-Get-Content "$env:USERPROFILE\.config\herdr-app\muster.json"
-# { "command": "bun", "prefix": ["…\service\src\cli.ts"], … }
-# or, with -Compile: { "command": "…\bin\muster.exe", "prefix": [] }
-```
-
-Run `bun <prefix> whoami` (or the exe). If the file is missing, fall back to
-`bun …\service\src\cli.ts whoami` under the app home. Add `--json` for
-machine-readable output.
+Install the CLI with `bun install -g 'github:SvalTek/Muster#main'`, then run
+`muster whoami`. Use `muster install` to install the Herdr layout, theme and
+mod. The Herdr install record is at `%USERPROFILE%\.config\herdr-app\muster.json`.
+Add `--json` for machine-readable output.
 
 ## Details
 

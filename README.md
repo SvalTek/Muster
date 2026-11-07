@@ -39,6 +39,8 @@ muster mcp
 Ensure Bun's global bin directory is on `PATH`. For an MCP client, configure
 `muster` as the command and `mcp` as its argument. `muster skill` prints the
 agent guide. Development takes place on `develop`; `main` is the stable branch.
+To update an existing installation to the latest `main` commit, run
+`bun update -g muster-agent`.
 
 From a checkout, `bun install -g .` installs the same CLI. Bun must be installed
 and its global bin directory must be on `PATH`. A compiled executable works

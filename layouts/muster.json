@@ -1,0 +1,153 @@
+{
+  "id": "root",
+  "type": "row",
+  "titlebar": "none",
+  "traffic_lights": [12, 16],
+  "background": "chrome",
+  "terminal_padding": [14, 12],
+  "divider": { "width": 1, "color": "border" },
+  "theme": { "light": "muster-day", "dark": "muster" },
+  "children": [
+    {
+      "id": "sidebar",
+      "type": "column",
+      "size": { "px": 268 },
+      "min": 216,
+      "max": 420,
+      "background": "chrome",
+      "resizable": true,
+      "children": [
+        {
+          "id": "brand",
+          "type": "block",
+          "size": { "px": 46 },
+          "window_drag": true,
+          "content": { "mod": "muster", "props": { "app": "brand" } }
+        },
+        {
+          "id": "muster-sidebar",
+          "type": "block",
+          "size": { "weight": 1 },
+          "min": 140,
+          "content": { "mod": "muster", "props": { "app": "sidebar" } }
+        },
+        {
+          "id": "sidebar-footer",
+          "type": "block",
+          "size": { "px": 74 },
+          "content": { "mod": "muster", "props": { "app": "footer" } }
+        }
+      ]
+    },
+    {
+      "id": "main-area",
+      "type": "column",
+      "padding": 6,
+      "gap": 4,
+      "children": [
+        {
+          "id": "topbar",
+          "type": "row",
+          "size": { "px": 42 },
+          "resizable": false,
+          "children": [
+            { "id": "tabs", "type": "block", "window_drag": true, "content": { "mod": "tabs" } },
+            {
+              "id": "bell",
+              "type": "block",
+              "size": { "px": 52 },
+              "window_drag": true,
+              "content": { "mod": "muster", "props": { "app": "bell" } }
+            }
+          ]
+        },
+        {
+          "id": "center",
+          "type": "stack",
+          "active": "board",
+          "background": "canvas",
+          "children": [
+            {
+              "id": "board",
+              "type": "block",
+              "radius": 10,
+              "border": { "width": 1, "color": "border" },
+              "background": "background",
+              "shadow": "sm",
+              "content": { "mod": "muster", "props": { "app": "board" } }
+            },
+            {
+              "id": "cards",
+              "type": "block",
+              "radius": 10,
+              "border": { "width": 1, "color": "border" },
+              "background": "background",
+              "shadow": "sm",
+              "content": { "mod": "muster", "props": { "app": "cards" } }
+            },
+            {
+              "id": "runbook",
+              "type": "block",
+              "radius": 10,
+              "border": { "width": 1, "color": "border" },
+              "background": "background",
+              "shadow": "sm",
+              "content": { "mod": "muster", "props": { "app": "runbook" } }
+            },
+            {
+              "id": "stats",
+              "type": "block",
+              "radius": 10,
+              "border": { "width": 1, "color": "border" },
+              "background": "background",
+              "shadow": "sm",
+              "content": { "mod": "muster", "props": { "app": "stats" } }
+            },
+            {
+              "id": "work",
+              "type": "row",
+              "padding": 0,
+              "gap": 6,
+              "children": [
+                {
+                  "id": "view",
+                  "type": "stack",
+                  "active": "main",
+                  "children": [
+                    {
+                      "id": "main",
+                      "type": "block",
+                      "content": {
+                        "tab": "active",
+                        "pane": {
+                          "gap": 6,
+                          "radius": 10,
+                          "background": "background",
+                          "lone": true,
+                          "border": { "width": 1, "color": "border" },
+                          "focus": { "width": 1, "color": "solid" },
+                          "header": {
+                            "content": { "mod": "muster", "props": { "app": "pane" } },
+                            "height": 30,
+                            "position": "top",
+                            "reveal": "always"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "status",
+          "type": "block",
+          "size": { "px": 28 },
+          "content": { "mod": "muster", "props": { "app": "status" } }
+        }
+      ]
+    }
+  ]
+}

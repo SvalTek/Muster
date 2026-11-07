@@ -1,0 +1,20 @@
+{
+  "name": "@muster/service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Muster's local store, CLI and MCP server.",
+  "bin": {
+    "muster": "./src/cli.ts"
+  },
+  "scripts": {
+    "muster": "bun run src/cli.ts",
+    "mcp": "bun run src/cli.ts mcp",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.0",
+    "typescript": "^5.7.0"
+  }
+}

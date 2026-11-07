@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+service/node_modules/
+
+# Muster data (lives outside the repo by default, but never commit it)
+muster.db
+*.db
+*.db-wal
+*.db-shm
+
+# Build output
+bin/muster.exe
+service/dist/
+
+# Editor / OS
+.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temp installer artifacts
+*.bak-*
+
+# Logs
+*.log

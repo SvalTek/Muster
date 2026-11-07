@@ -1,0 +1,11 @@
+{
+  "layout:muster": {
+    "ctrl-shift-1": "muster.go:board",
+    "ctrl-shift-2": "muster.go:cards",
+    "ctrl-shift-3": "muster.go:runbook",
+    "ctrl-shift-4": "muster.go:stats",
+    "ctrl-shift-5": "muster.go:work",
+    "ctrl-shift-m": "muster.next",
+    "ctrl-shift-r": "muster.refresh"
+  }
+}

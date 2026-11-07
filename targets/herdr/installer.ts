@@ -1,6 +1,7 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
+import { createHash } from "node:crypto";
 import { musterHome } from "../../app/paths.ts";
 import { MusterError } from "../../app/store.ts";
 import { MUSTER_VERSION } from "../../app/version.ts";
@@ -52,6 +53,22 @@ export async function installHerdr(options: HerdrInstallOptions = {}) {
     throw new MusterError("install_config", `The layout:muster section in ${keysPath} must be an object.`);
   }
   const defaults = JSON.parse(HERDR_ASSETS["keys.json"]!)["layout:muster"] as Record<string, string>;
+  let previous: Record<string, unknown> = {};
+  const recordPath = join(appHome, "muster.json");
+  if (existsSync(recordPath)) {
+    try { previous = jsonFile(recordPath); } catch { /* Legacy or damaged record; retain existing bindings. */ }
+  }
+  const addedBindings: Record<string, string> = {};
+  if (object(previous.addedBindings)) {
+    for (const [key, value] of Object.entries(previous.addedBindings)) {
+      if (Object.hasOwn(defaults, key) && typeof value === "string") addedBindings[key] = value;
+    }
+  }
+  if (!options.noKeys) {
+    for (const [key, value] of Object.entries(defaults)) {
+      if (!object(existing) || !Object.hasOwn(existing, key)) addedBindings[key] = value;
+    }
+  }
   const bindings = { ...defaults, ...(object(existing) ? existing : {}) };
   const keysChanged = !options.noKeys && (existing === undefined || Object.keys(defaults).some((key) => !Object.hasOwn(existing as object, key)));
   if (keysChanged) keys["layout:muster"] = bindings;
@@ -89,8 +106,10 @@ export async function installHerdr(options: HerdrInstallOptions = {}) {
   if (binaryPath && resolve(process.execPath).toLowerCase() !== resolve(binaryPath).toLowerCase()) copyFileSync(process.execPath, binaryPath);
   mkdirSync(dataHome, { recursive: true });
   mkdirSync(dirname(db), { recursive: true });
-  const record = { command, prefix, db, version: MUSTER_VERSION, installedAt: new Date().toISOString() };
-  writeFileSync(join(appHome, "muster.json"), `${JSON.stringify(record, null, 2)}\n`);
+  const runtimePath = binaryPath ?? prefix[0]!;
+  const runtime = { file: basename(runtimePath), sha256: createHash("sha256").update(readFileSync(runtimePath)).digest("hex") };
+  const record = { command, prefix, db, version: MUSTER_VERSION, installedAt: new Date().toISOString(), addedBindings, runtime };
+  writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}\n`);
   if (keysChanged) writeFileSync(keysPath, `${JSON.stringify(keys, null, 2)}\n`);
   return { target: "herdr", appHome, dataHome, db, command, prefix, keysUpdated: keysChanged, backups };
 }

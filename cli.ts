@@ -124,6 +124,7 @@ const USAGE = `muster ${MUSTER_VERSION} — project-scoped attention for coding 
 
 Usage:
   muster install [herdr] [--app-home DIR] [--muster-home DIR] [--no-keys]
+  muster uninstall [herdr] [--app-home DIR]
   muster init [--name N] [--id ID] [--color #hex] [--runbook path] [--force]
   muster resolve [path] [--json]
   muster whoami [--path DIR] [--agent A] [--terminal T]
@@ -239,6 +240,19 @@ async function main(): Promise<void> {
   };
 
   switch (command) {
+    case "uninstall": {
+      const { uninstall } = await import("./install.ts");
+      const result = uninstall(sub, { appHome: flags.string("app-home") });
+      emit(result, () => {
+        console.log(result.disabled ? `Muster disabled in Herdr: ${result.appHome}` : `Could not fully disable Muster: ${result.appHome}`);
+        console.log("Muster data, the global CLI, and MCP configuration were kept.");
+        if (result.backups.length) console.log(`Backups: ${result.backups.join(", ")}`);
+        for (const warning of result.warnings) console.warn(`muster: ${warning}`);
+        console.log("Switch Herdr to another layout and restart or reload it.");
+      });
+      if (!result.disabled) process.exitCode = 1;
+      return;
+    }
     case "install": {
       const { install } = await import("./install.ts");
       const result = await install(sub, {

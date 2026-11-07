@@ -75,6 +75,28 @@ give it its own key, add this to the `global` section of `keys.json`:
 
 Claude Code, Codex, or any other MCP client can now connect to the service.
 
+## Turn off or uninstall the Herdr integration
+
+If Herdr is open, switch to another layout and theme if possible, then close
+Herdr. Run:
+
+```powershell
+muster uninstall
+```
+
+Use `muster uninstall --app-home D:\herdr-app` for a custom app home. The
+command removes Muster's layout, mod and theme files, backing up modified files.
+It removes only unchanged key bindings recorded as added by Muster; older
+installations without that record keep their bindings. The database, backups,
+global CLI and MCP client configurations are kept. Reopen Herdr with another
+layout; run `muster install` to install the integration again.
+
+If the CLI cannot start, close Herdr and rename `layouts/muster.json` and
+`mods/muster/mod.json` in the Herdr app home (for example, give each a
+`.disabled` extension). That makes the layout and mod unavailable without
+deleting their contents or the database. The default app home on Windows is
+`%USERPROFILE%\.config\herdr-app`.
+
 ## Connect an agent
 
 The MCP server is the same executable as the CLI, with `mcp` after it. After

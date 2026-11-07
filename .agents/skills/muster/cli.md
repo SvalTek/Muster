@@ -30,6 +30,7 @@ or a file, so quoting doesn't eat newlines.
 
 ```text
 muster install [herdr] [--app-home DIR] [--muster-home DIR] [--no-keys]
+muster uninstall [herdr] [--app-home DIR]
 muster whoami [--path DIR] [--agent A] [--terminal T]
 muster status <working|blocked|waiting|done|failed|idle> [summary]
 muster ask --question Q [--choice id:label]... [--timeout S] [--dedupe K]
@@ -67,6 +68,10 @@ muster version
 mcp`, `muster skill cards`, or `muster skill all` to read a guide. Other
 arguments search all bundled guides case-insensitively and return matching
 Markdown sections, for example `muster skill pending`.
+
+`muster uninstall` disables the Herdr layout and mod, preserves data and
+backups, and removes only recorded, unchanged key bindings. Close Herdr first;
+use `--app-home DIR` when it is installed somewhere other than the default.
 
 Card kinds: `question`, `approval`, `report`, `result`, `progress`.
 Severities: `info`, `attention`, `blocked`, `success` (defaults to

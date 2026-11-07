@@ -1,9 +1,8 @@
 # Muster
 
-Muster is a project-scoped attention board for coding agents, built as a Herdr
-package. Agents report what they are doing, ask for decisions instead of
-guessing, and leave durable cards behind. A person watches one quiet window
-instead of five terminals.
+Muster is a Herdr theme and attention board for coding agents, with a CLI and
+an MCP server. Agents report what they are doing, ask for decisions, and leave
+durable cards behind. A person can watch their work in one Herdr window.
 
 Muster is standalone. It borrows Kanso's calm, flat visual language and
 cockpit's card and runbook ideas, but it has its own service, store, theme,
@@ -20,24 +19,28 @@ layout and mod.
 
 ## Requirements
 
-- Windows 10/11 (the service also runs on macOS and Linux).
-- [Bun](https://bun.sh) 1.1 or newer.
-- A Herdr install with the app home at `%USERPROFILE%\.config\herdr-app`.
+- [Bun](https://bun.sh) 1.1 or newer for the CLI and MCP server.
+- Windows 10/11 and a Herdr install at `%USERPROFILE%\.config\herdr-app` for
+  the Herdr theme and board. The service also runs on macOS and Linux.
 - Git is optional; without it, Muster falls back to the folder name.
 
 Muster has no runtime dependencies. The service uses Bun's built-in SQLite.
 
 ## Install
 
-For the CLI and MCP server alone, install from GitHub with Bun:
+Install the CLI and MCP server from the latest stable `main` commit:
 
 ```powershell
-bun add -g github:SvalTek/Muster
+bun install -g 'github:SvalTek/Muster#main'
 muster skill
 muster mcp
 ```
 
-From a checkout, `bun add -g .` installs the same CLI. Bun must be installed
+Ensure Bun's global bin directory is on `PATH`. For an MCP client, configure
+`muster` as the command and `mcp` as its argument. `muster skill` prints the
+agent guide. Development takes place on `develop`; `main` is the stable branch.
+
+From a checkout, `bun install -g .` installs the same CLI. Bun must be installed
 and its global bin directory must be on `PATH`. A compiled executable works
 without Bun; put it on `PATH` and use the same commands. `bunx` runs a package
 but does not install it globally.

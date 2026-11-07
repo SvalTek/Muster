@@ -48,6 +48,8 @@ describe("mcp protocol", () => {
     expect(response.result.serverInfo.name).toBe("muster");
     expect(response.result.protocolVersion).toBe("2025-06-18");
     expect(response.result.capabilities.tools).toBeDefined();
+    expect(response.result.instructions).toContain("Before using Muster tools, read the `muster://skill` resource");
+    expect(response.result.instructions).toContain("muster://skill?section=cli");
     expect(response.result.instructions).toContain("muster_whoami");
   });
 

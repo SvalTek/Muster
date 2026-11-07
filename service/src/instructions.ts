@@ -7,6 +7,9 @@ Muster is this project's coordination layer. A person watches a Herdr window.
 You report through Muster so they do not have to read your terminal.
 
 ## At the start
+- Before using Muster tools, read the \`muster://skill\` resource for its
+  workflow. Use \`muster://skill?section=cli\`, \`mcp\`, or \`cards\` for a
+  guide, or put a search term in \`section\` to search all skill files.
 - Call muster_whoami. It resolves the project, creates your run, and returns
   the cards already waiting for you.
 
@@ -35,8 +38,7 @@ You report through Muster so they do not have to read your terminal.
 ## Style
 - Titles are short and concrete. Bodies may be markdown.
 - Say what changed, what is uncertain, and what the person should do next.
-- Never put secrets, tokens or private keys in a card or event.
-- Read the \`muster://skill\` resource for the full CLI and workflow reference.`;
+- Never put secrets, tokens or private keys in a card or event.`;
 
 /** A short block a repository can paste into AGENTS.md or CLAUDE.md. */
 export const AGENT_SNIPPET = `## Muster
